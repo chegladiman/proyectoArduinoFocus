@@ -114,6 +114,9 @@ void loop(){
 
 
   distancia=Distance_test();
+  
+  int distancia2;
+  int distanciaOriginal;
   if(distancia<30){
 
      _mleft();
@@ -124,6 +127,32 @@ void loop(){
   
   }
 }
+
+  void _buscarEstacionamiento()
+  {
+  
+  myservo.write(90);
+  _mForward()
+  distancia;
+  
+  
+  
+  }
+
+
+  void _posibleLugar()
+
+  _buscarEstacionamiento();
+
+  distanciaOriginal= distancia2-distancia;
+
+  if(distancia2>distancia){
+
+    
+  }
+  
+  
+
   
 
   
