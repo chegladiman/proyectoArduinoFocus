@@ -1,4 +1,10 @@
 #include<Servo.h>
+
+#define ESTADO_BUSCANDO 0
+#define ESTADO_POSIBLE_LUGAR 1
+#define ESTADO_FIN_LUGAR 2
+#define ESTADO_MANIOBRA 3
+
 Servo myservo; // create servo object to control servo
 int Echo = A4;  
 int Trig = A5;
@@ -8,12 +14,14 @@ int in3 = 8;
 int in4 = 9;
 int ENA = 5;
 int ENB = 11;
-int ABS = 170;
+int ABS = 100;
 int distancia;
+int estado;
 
 
 void setup(){
-
+  
+ 
   myservo.attach(3);// attach servo on pin 3 to servo object
   Serial.begin(9600);     
   pinMode(Echo, INPUT);    
@@ -24,10 +32,9 @@ void setup(){
   pinMode(in4,OUTPUT);
   pinMode(ENA,OUTPUT);
   pinMode(ENB,OUTPUT);
-
-  
-  _mForward();
+  estado = ESTADO_BUSCANDO;
 }
+
 
 
 
@@ -94,64 +101,108 @@ int Distance_test()
   return (int)Fdistance;  
 }
 
-void loop(){
-  /*
-  _mForward();
-  delay(250);
-   _mStop();
-  _mright();
-  delay(250);
-  _mStop();
-  _mForward();
-  delay(250);
-  _mStop();
-  _mleft();
-  delay(500);
-  _mStop();
-  */
 
 
 
 
-  distancia=Distance_test();
   
-  int distancia2;
+  
+  
   int distanciaOriginal;
-  if(distancia<30){
+  unsigned long inicioLugar;
 
-     _mleft();
-     delay(500);
-     _mForward();
-     _mStop();
-  
-  
-  }
-}
+
+
 
   void _buscarEstacionamiento()
   {
   
-  myservo.write(90);
-  _mForward()
-  distancia;
+    myservo.write(160);
+    _mForward();
+    distancia=Distance_test();
+    if(distancia>distanciaOriginal+10)
+    {
+      inicioLugar=millis();
+      estado = ESTADO_POSIBLE_LUGAR;
+    }
   
-  
-  
+  distanciaOriginal=distancia;
   }
+  unsigned long finLugar;
+  unsigned long D;
 
+  void _lugarEncontrado(){
 
-  void _posibleLugar()
+  myservo.write(160);
+  _mForward();
+  distancia=Distance_test();
+  if(distancia<distanciaOriginal-10){
+  
 
-  _buscarEstacionamiento();
+  finLugar=millis();
 
-  distanciaOriginal= distancia2-distancia;
+  D=finLugar-inicioLugar;
 
-  if(distancia2>distancia){
+    _mStop();
+    delay(1000);
+estado=ESTADO_FIN_LUGAR;
 
     
+    
+    
   }
+
+ 
+  }
+
+ void  _maniobraEstacionamiento(){
+    _mBack();
+    delay(D/2);
+
+    _mleft();
+    delay(500);
+
+    _mForward();
+    delay(700);
+
+    _mright();
+    delay(500);
+
+    _mBack();
+    delay(250);
+
+    _mStop();
+
+    estado= ESTADO_MANIOBRA;
+    
+  }
+ 
   
+void loop(){
+  switch(estado)
+  {
+    case ESTADO_BUSCANDO:
+       _buscarEstacionamiento();
+    break;
+
+    case ESTADO_POSIBLE_LUGAR:
+    _lugarEncontrado();
+    break;
+
+    case ESTADO_FIN_LUGAR:
+    _maniobraEstacionamiento();
+    break;
+
+    
+
+    
+    
+    
+    
+  }
+}
   
+
 
   
 
